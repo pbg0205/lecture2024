@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: lecture2024
+  jpa:
+    show-sql: true
+    open-in-view: false
+    hibernate:
+      ddl-auto: create-drop
+  datasource:
+    url: jdbc:mysql://localhost:3306/lecture_db
+    username: root
+    password: lecture2024
+    driver-class-name: com.mysql.cj.jdbc.Driver
