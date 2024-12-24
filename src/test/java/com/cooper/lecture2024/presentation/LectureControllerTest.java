@@ -1,0 +1,84 @@
+package com.cooper.lecture2024.presentation;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+
+import com.cooper.lecture2024.business.LectureApplyFacade;
+import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
+
+@WebMvcTest(LectureController.class)
+class LectureControllerTest {
+
+	@Autowired
+	private MockMvc mockMvc;
+
+	@MockitoBean
+	private LectureApplyFacade lectureApplyFacade;
+
+	@DisplayName("[실패] 잘못된 검색 강의 포맷으로 인한 실패")
+	@Test
+	void invalidStartDateFormat() throws Exception {
+		// given
+		String startDate = "20241224";
+
+		// when
+		final ResultActions result = mockMvc.perform(get("/api/lectures/{startDate}", startDate)
+			.contentType(MediaType.APPLICATION_JSON));
+
+		// then
+		result.andExpectAll(
+				status().isBadRequest(),
+				jsonPath("$.code").value("COMMON01"),
+				jsonPath("$.message").value("요청 값을 지원하지 않거나 올바르지 않은 값입니다."))
+			.andDo(print());
+	}
+
+	@DisplayName("[성공] 올바른 포팻(yyyy-MM-dd)으로 강의 시작 날짜과 일치하는 경우, 목록 반환")
+	@Test
+	void findLecturesByStartAtBetween() throws Exception {
+		// given
+		String startDate = "2024-12-24";
+
+		when(lectureApplyFacade.findLecturesByStartAtBetween(any(), any()))
+			.thenReturn(
+				List.of(
+					new LectureQueryResult(1L, "title01", 20, "강연자01", LocalDateTime.of(2024, 12, 24, 9, 0)),
+					new LectureQueryResult(2L, "title02", 16, "강연자02", LocalDateTime.of(2024, 12, 24, 10, 0)),
+					new LectureQueryResult(3L, "title02", 13, "강연자03", LocalDateTime.of(2024, 12, 24, 10, 30))
+				)
+			);
+
+		// when
+		final ResultActions result = mockMvc.perform(get("/api/lectures/{startDate}", startDate)
+			.contentType(MediaType.APPLICATION_JSON));
+
+		// then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$").isArray(),
+				jsonPath("$", hasSize(3)),
+				jsonPath("$[0].lectureId").value(1L),
+				jsonPath("$[0].title").value("title01"),
+				jsonPath("$[0].remainingCount").value(20),
+				jsonPath("$[0].lecturerName").value("강연자01"),
+				jsonPath("$[0].startAt").value("2024-12-24T09:00:00"))
+			.andDo(print());
+	}
+}
