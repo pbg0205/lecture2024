@@ -1,6 +1,7 @@
 package com.cooper.lecture2024.business;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -17,7 +18,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
+import com.cooper.lecture2024.business.errors.LectureErrorCode;
+import com.cooper.lecture2024.business.errors.LectureErrorType;
+import com.cooper.lecture2024.business.errors.exception.LectureNotFoundException;
 import com.cooper.lecture2024.business.repository.LectureRepository;
+import com.cooper.lecture2024.domain.Lecture;
 
 @ExtendWith(MockitoExtension.class)
 class LectureManagerTest {
@@ -72,5 +77,39 @@ class LectureManagerTest {
 
 		// then
 		assertThat(lectureQueryResultList).hasSize(0);
+	}
+
+	@DisplayName("[실패] 강의 아이디와 일치하는 강의가 없는 경우, 요청 실패")
+	@Test
+	void lectureNotFound() {
+		// given
+		final long lectureId = 1L;
+
+		when(lectureRepository.findById(any())).thenReturn(null);
+
+		// when, then
+		assertThatThrownBy(() -> lectureManager.findById(lectureId))
+			.isInstanceOf(LectureNotFoundException.class)
+			.extracting("errorType")
+			.isInstanceOf(LectureErrorType.class)
+			.satisfies(
+				errorType -> assertThat(((LectureErrorType)errorType).getErrorCode()).isEqualTo(
+					LectureErrorCode.LECTURE02));
+	}
+
+	@DisplayName("[성공] 강의 아이디를 통해 강의 조회")
+	@Test
+	void findById() {
+		// given
+		final long lectureId = 1L;
+
+		when(lectureRepository.findById(any())).thenReturn(
+			new Lecture("lecture_title01", LocalDateTime.now(), 2L, 30, 30));
+
+		// when
+		final Lecture lecture = lectureManager.findById(lectureId);
+
+		// then
+		assertThat(lecture.getTitle()).isEqualTo("lecture_title01");
 	}
 }
