@@ -12,8 +12,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import com.cooper.lecture2024.business.errors.LectureErrorType;
+import com.cooper.lecture2024.business.errors.exception.LectureConstraintsViolationException;
+
+@Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Lecture {
@@ -47,4 +52,26 @@ public class Lecture {
 	@Column(nullable = false, columnDefinition = "timestamp")
 	private LocalDateTime modifiedAt;
 
+	public Lecture(final String title, final LocalDateTime startAt, final Long lecturerId, final Integer remainingCount,
+		final Integer capacity) {
+		validateRemainingCountNegative(remainingCount);
+		validateRemainingCountLessThanCapacity(remainingCount, capacity);
+		this.title = title;
+		this.startAt = startAt;
+		this.lecturerId = lecturerId;
+		this.remainingCount = remainingCount;
+		this.capacity = capacity;
+	}
+
+	private void validateRemainingCountLessThanCapacity(final Integer remainingCount, final Integer capacity) {
+		if (remainingCount > capacity) {
+			throw new LectureConstraintsViolationException(LectureErrorType.GREATER_THAN_CAPACITY);
+		}
+	}
+
+	private void validateRemainingCountNegative(final Integer remainingCount) {
+		if (remainingCount < 0) {
+			throw new LectureConstraintsViolationException(LectureErrorType.REMAINING_COUNT_NEGATIVE);
+		}
+	}
 }
