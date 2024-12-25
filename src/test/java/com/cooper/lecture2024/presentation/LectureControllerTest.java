@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -20,14 +21,25 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.cooper.lecture2024.business.LectureApplyFacade;
+import com.cooper.lecture2024.business.dto.response.LectureApplyResult;
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
+import com.cooper.lecture2024.business.errors.LectureErrorType;
+import com.cooper.lecture2024.business.errors.StudentErrorType;
+import com.cooper.lecture2024.business.errors.exception.LectureNotFoundException;
+import com.cooper.lecture2024.business.errors.exception.StudentNotFoundException;
+import com.cooper.lecture2024.presentation.dto.request.LectureApplyRequest;
 
 @WebMvcTest(LectureController.class)
 class LectureControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
+
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@MockitoBean
 	private LectureApplyFacade lectureApplyFacade;
@@ -79,6 +91,75 @@ class LectureControllerTest {
 				jsonPath("$[0].remainingCount").value(20),
 				jsonPath("$[0].lecturerName").value("강연자01"),
 				jsonPath("$[0].startAt").value("2024-12-24T09:00:00"))
+			.andDo(print());
+	}
+
+	@DisplayName("[실패] 수강 신청 시, 학생 조회 실패")
+	@Test
+	void notFoundStudent() throws Exception {
+		// given
+		final LectureApplyRequest lectureApplyRequest = new LectureApplyRequest(1L, 1L);
+		final String content = objectMapper.writeValueAsString(lectureApplyRequest);
+
+		when(lectureApplyFacade.applyLecture(any(), any()))
+			.thenThrow(new StudentNotFoundException(StudentErrorType.STUDENT_NOT_FOUND));
+
+		// when
+		final ResultActions result = mockMvc.perform(post("/api/lectures/apply")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(content));
+
+		// then
+		result.andExpectAll(
+				status().isBadRequest(),
+				jsonPath("$.code").value("STUDENT01"),
+				jsonPath("$.message").value("해당 학생을 찾을 수 없습니다."))
+			.andDo(print());
+	}
+
+	@DisplayName("[실패] 수강 신청 시, 강의 조회 실패")
+	@Test
+	void notFoundLecture() throws Exception {
+		// given
+		final LectureApplyRequest lectureApplyRequest = new LectureApplyRequest(1L, 1L);
+		final String content = objectMapper.writeValueAsString(lectureApplyRequest);
+
+		when(lectureApplyFacade.applyLecture(any(), any()))
+			.thenThrow(new LectureNotFoundException(LectureErrorType.LECTURE_NOT_FOUND));
+
+		// when
+		final ResultActions result = mockMvc.perform(post("/api/lectures/apply")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(content));
+
+		// then
+		result.andExpectAll(
+				status().isBadRequest(),
+				jsonPath("$.code").value("LECTURE02"),
+				jsonPath("$.message").value("강의를 찾을 수 없습니다."))
+			.andDo(print());
+	}
+
+	@DisplayName("[성공] 수강 신청 완료")
+	@Test
+	void lectureApply() throws Exception {
+		// given
+		final LectureApplyRequest lectureApplyRequest = new LectureApplyRequest(1L, 1L);
+		final String content = objectMapper.writeValueAsString(lectureApplyRequest);
+
+		when(lectureApplyFacade.applyLecture(any(), any()))
+			.thenReturn(new LectureApplyResult("학생 이름1", "강의명1"));
+
+		// when
+		final ResultActions result = mockMvc.perform(post("/api/lectures/apply")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(content));
+
+		// then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.studentName").value("학생 이름1"),
+				jsonPath("$.lectureName").value("강의명1"))
 			.andDo(print());
 	}
 }

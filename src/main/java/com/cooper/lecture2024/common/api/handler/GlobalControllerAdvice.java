@@ -1,6 +1,7 @@
 package com.cooper.lecture2024.common.api.handler;
 
 import org.springframework.beans.TypeMismatchException;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -12,6 +13,7 @@ import com.cooper.lecture2024.common.api.errors.ErrorResponse;
 
 @RestControllerAdvice
 @Slf4j
+@Order
 public class GlobalControllerAdvice {
 
 	@ExceptionHandler(Exception.class)

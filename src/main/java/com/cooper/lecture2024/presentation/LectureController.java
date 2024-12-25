@@ -8,13 +8,18 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 
 import com.cooper.lecture2024.business.LectureApplyFacade;
+import com.cooper.lecture2024.business.dto.response.LectureApplyResult;
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
+import com.cooper.lecture2024.presentation.dto.request.LectureApplyRequest;
+import com.cooper.lecture2024.presentation.dto.response.LectureApplyResponse;
 import com.cooper.lecture2024.presentation.dto.response.LectureQueryResponse;
 
 @RestController
@@ -37,5 +42,17 @@ public class LectureController {
 			lectureQueryResults.stream().map(LectureQueryResponse::from).toList();
 
 		return ResponseEntity.ok().body(lectureQueryResponses);
+	}
+
+	@PostMapping("/apply")
+	public ResponseEntity<LectureApplyResponse> applyLecture(
+		@RequestBody final LectureApplyRequest lectureApplyRequest) {
+		final LectureApplyResult lectureApplyResult = lectureApplyFacade.applyLecture(lectureApplyRequest.getUserId(),
+			lectureApplyRequest.getLectureId());
+
+		final LectureApplyResponse lectureApplyResponse = new LectureApplyResponse(lectureApplyResult.studentName(),
+			lectureApplyResult.lectureName());
+
+		return ResponseEntity.ok().body(lectureApplyResponse);
 	}
 }
