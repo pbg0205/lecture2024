@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.jdbc.Sql;
 
+import com.cooper.lecture2024.business.dto.response.ApplySuccessResult;
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
 import com.cooper.lecture2024.domain.Lecture;
 import com.cooper.lecture2024.domain.LectureApply;
@@ -99,4 +100,19 @@ class LectureRepositoryTest {
 		});
 	}
 
+	@Test
+	@DisplayName("[성공] 학생의 강의 성공 목록 조회")
+	@Sql({"classpath:sql/lecture_sample.sql", "classpath:sql/lecturer_sample.sql",
+		"classpath:sql/students_sample.sql", "classpath:sql/lecture_apply_sample.sql"})
+	void findAllApplySuccessByStudentId() {
+		// given
+		final Long studentId = 1L;
+
+		// when
+		final List<ApplySuccessResult> applySuccessResults = lectureRepository.findAllApplySuccessByStudentId(
+			studentId);
+
+		// then
+		assertThat(applySuccessResults).hasSize(5);
+	}
 }
