@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.cooper.lecture2024.business.dto.ApplyCreationResult;
+import com.cooper.lecture2024.business.dto.response.ApplySuccessResult;
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
 import com.cooper.lecture2024.business.errors.LectureErrorCode;
 import com.cooper.lecture2024.business.errors.LectureErrorType;
@@ -135,4 +136,26 @@ class LectureManagerTest {
 		// then
 		assertThat(applyCreationResult.lectureTitle()).isEqualTo("lecture_title");
 	}
+
+	@DisplayName("[성공] 강의 신청 성공 목록 조회 ")
+	@Test
+	void findAllApplySuccessByStudentId() {
+		// given
+		final Long studentId = 1L;
+
+		when(lectureRepository.findAllApplySuccessByStudentId(any()))
+			.thenReturn(List.of(
+				new ApplySuccessResult(1L, "강의명1", "강연자1"),
+				new ApplySuccessResult(2L, "강의명2", "강연자2"),
+				new ApplySuccessResult(3L, "강의명3", "강연자3"),
+				new ApplySuccessResult(4L, "강의명4", "강연자4"))
+			);
+
+		// when
+		final List<ApplySuccessResult> applySuccessResults = lectureManager.findAllApplySuccessByStudentId(studentId);
+
+		// then
+		assertThat(applySuccessResults).hasSize(4);
+	}
+
 }

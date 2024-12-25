@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import com.cooper.lecture2024.business.dto.ApplyCreationResult;
+import com.cooper.lecture2024.business.dto.response.ApplySuccessResult;
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
 import com.cooper.lecture2024.business.errors.LectureErrorType;
 import com.cooper.lecture2024.business.errors.exception.LectureNotFoundException;
@@ -42,5 +43,10 @@ public class LectureManager {
 	private Lecture findLectureById(final Long lectureId) {
 		return Optional.ofNullable(lectureRepository.findLectureById(lectureId))
 			.orElseThrow(() -> new LectureNotFoundException(LectureErrorType.LECTURE_NOT_FOUND));
+	}
+
+	@Transactional(readOnly = true)
+	public List<ApplySuccessResult> findAllApplySuccessByStudentId(final Long studentId) {
+		return lectureRepository.findAllApplySuccessByStudentId(studentId);
 	}
 }
