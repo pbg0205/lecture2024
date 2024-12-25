@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.cooper.lecture2024.business.dto.ApplyCreationResult;
+import com.cooper.lecture2024.business.dto.response.ApplySuccessResult;
 import com.cooper.lecture2024.business.dto.response.LectureApplyResult;
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
 import com.cooper.lecture2024.business.dto.response.StudentQueryResult;
@@ -131,5 +132,27 @@ class LectureApplyFacadeTest {
 			softAssertions.assertThat(lectureApplyResult.studentName()).isEqualTo("학생 이름1");
 			softAssertions.assertThat(lectureApplyResult.lectureName()).isEqualTo("강의명1");
 		});
+	}
+
+	@Test
+	@DisplayName("[성공] 학생 수강 신청 성공 목록 조회")
+	void findAllApplySuccessByStudentId() {
+		// given
+		final Long userId = 1L;
+
+		when(studentManager.findStudentQueryById(any())).thenReturn(new StudentQueryResult(1L, "학생 이름1"));
+		when(lectureManager.findAllApplySuccessByStudentId(any())).thenReturn(List.of(
+			new ApplySuccessResult(1L, "강의명1", "강연자1"),
+			new ApplySuccessResult(2L, "강의명2", "강연자2"),
+			new ApplySuccessResult(3L, "강의명3", "강연자3"),
+			new ApplySuccessResult(4L, "강의명4", "강연자4"),
+			new ApplySuccessResult(5L, "강의명5", "강연자5")
+		));
+
+		// when
+		final List<ApplySuccessResult> applySuccessResults = lectureApplyFacade.findAllApplySuccessByStudentId(userId);
+
+		// then
+		assertThat(applySuccessResults).hasSize(5);
 	}
 }

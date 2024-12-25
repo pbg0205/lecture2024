@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import com.cooper.lecture2024.business.dto.ApplyCreationResult;
+import com.cooper.lecture2024.business.dto.response.ApplySuccessResult;
 import com.cooper.lecture2024.business.dto.response.LectureApplyResult;
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
 import com.cooper.lecture2024.business.dto.response.StudentQueryResult;
@@ -40,5 +41,11 @@ public class LectureApplyFacade {
 		final ApplyCreationResult applyCreationResult = lectureManager.applyLecture(studentQueryResult.id(), lectureId);
 
 		return new LectureApplyResult(studentQueryResult.name(), applyCreationResult.lectureTitle());
+	}
+
+	@Transactional(readOnly = true)
+	public List<ApplySuccessResult> findAllApplySuccessByStudentId(final Long studentId) {
+		final StudentQueryResult studentQueryById = studentManager.findStudentQueryById(studentId);
+		return lectureManager.findAllApplySuccessByStudentId(studentId);
 	}
 }
