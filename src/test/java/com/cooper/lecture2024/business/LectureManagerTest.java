@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.cooper.lecture2024.business.dto.ApplyCreationResult;
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
 import com.cooper.lecture2024.business.errors.LectureErrorCode;
 import com.cooper.lecture2024.business.errors.LectureErrorType;
@@ -85,12 +85,13 @@ class LectureManagerTest {
 	@Test
 	void lectureNotFound() {
 		// given
+		final long studentId = 1L;
 		final long lectureId = 1L;
 
 		when(lectureRepository.findLectureById(any())).thenReturn(null);
 
 		// when, then
-		assertThatThrownBy(() -> lectureManager.findLectureById(lectureId))
+		assertThatThrownBy(() -> lectureManager.applyLecture(studentId, lectureId))
 			.isInstanceOf(LectureNotFoundException.class)
 			.extracting("errorType")
 			.isInstanceOf(LectureErrorType.class)
@@ -103,16 +104,17 @@ class LectureManagerTest {
 	@Test
 	void findLectureById() {
 		// given
+		final long studentId = 1L;
 		final long lectureId = 1L;
 
 		when(lectureRepository.findLectureById(any())).thenReturn(
 			new Lecture("lecture_title01", LocalDateTime.now(), 2L, 30, 30));
 
 		// when
-		final Lecture lecture = lectureManager.findLectureById(lectureId);
+		final ApplyCreationResult applyCreationResult = lectureManager.applyLecture(studentId, lectureId);
 
 		// then
-		assertThat(lecture.getTitle()).isEqualTo("lecture_title01");
+		assertThat(applyCreationResult.lectureTitle()).isEqualTo("lecture_title01");
 	}
 
 	@DisplayName("[성공] 강의 신청 저장")
@@ -124,14 +126,13 @@ class LectureManagerTest {
 
 		when(lectureRepository.saveLectureApply(any(), any())).thenReturn(
 			new LectureApply(studentId, lectureId));
+		when(lectureRepository.findLectureById(any()))
+			.thenReturn(new Lecture("lecture_title", LocalDateTime.of(2024, 12, 24, 12, 0), 1L, 30, 30));
 
 		// when
-		final LectureApply lectureApply = lectureManager.applyLecture(studentId, lectureId);
+		final ApplyCreationResult applyCreationResult = lectureManager.applyLecture(studentId, lectureId);
 
 		// then
-		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(lectureApply.getStudentId()).isEqualTo(1L);
-			softAssertions.assertThat(lectureApply.getLectureId()).isEqualTo(1L);
-		});
+		assertThat(applyCreationResult.lectureTitle()).isEqualTo("lecture_title");
 	}
 }

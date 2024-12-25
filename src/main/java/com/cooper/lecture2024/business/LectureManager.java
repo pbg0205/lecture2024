@@ -8,13 +8,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
+import com.cooper.lecture2024.business.dto.ApplyCreationResult;
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
 import com.cooper.lecture2024.business.errors.LectureErrorType;
 import com.cooper.lecture2024.business.errors.exception.LectureNotFoundException;
 import com.cooper.lecture2024.business.repository.LectureRepository;
 import com.cooper.lecture2024.common.annotations.Manager;
 import com.cooper.lecture2024.domain.Lecture;
-import com.cooper.lecture2024.domain.LectureApply;
 
 @Manager
 @RequiredArgsConstructor
@@ -30,13 +30,17 @@ public class LectureManager {
 	}
 
 	@Transactional
-	public Lecture findLectureById(final Long lectureId) {
-		return Optional.ofNullable(lectureRepository.findLectureById(lectureId))
-			.orElseThrow(() -> new LectureNotFoundException(LectureErrorType.LECTURE_NOT_FOUND));
+	public ApplyCreationResult applyLecture(final Long studentId, final Long lectureId) {
+		final Lecture lecture = findLectureById(lectureId);
+		lecture.decreaseRemainingCount();
+
+		lectureRepository.saveLectureApply(studentId, lectureId);
+
+		return new ApplyCreationResult(lecture.getTitle());
 	}
 
-	@Transactional
-	public LectureApply applyLecture(final Long studentId, final Long lectureId) {
-		return lectureRepository.saveLectureApply(studentId, lectureId);
+	private Lecture findLectureById(final Long lectureId) {
+		return Optional.ofNullable(lectureRepository.findLectureById(lectureId))
+			.orElseThrow(() -> new LectureNotFoundException(LectureErrorType.LECTURE_NOT_FOUND));
 	}
 }
