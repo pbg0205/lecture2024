@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.cooper.lecture2024.business.LectureApplyFacade;
+import com.cooper.lecture2024.business.dto.response.ApplySuccessResult;
 import com.cooper.lecture2024.business.dto.response.LectureApplyResult;
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
 import com.cooper.lecture2024.business.errors.LectureErrorType;
@@ -119,7 +120,7 @@ class LectureControllerTest {
 
 	@DisplayName("[실패] 수강 신청 시, 강의 조회 실패")
 	@Test
-	void notFoundLecture() throws Exception {
+	void notFoundLectureWhenLectureApply() throws Exception {
 		// given
 		final LectureApplyRequest lectureApplyRequest = new LectureApplyRequest(1L, 1L);
 		final String content = objectMapper.writeValueAsString(lectureApplyRequest);
@@ -160,6 +161,52 @@ class LectureControllerTest {
 				status().isOk(),
 				jsonPath("$.studentName").value("학생 이름1"),
 				jsonPath("$.lectureName").value("강의명1"))
+			.andDo(print());
+	}
+
+	@DisplayName("[실패] 학생 수강 성공 조회시, 학생 조회 실패")
+	@Test
+	void notFoundStudentWhenApplySuccess() throws Exception {
+		// given
+		when(lectureApplyFacade.findAllApplySuccessByStudentId(any()))
+			.thenThrow(new StudentNotFoundException(StudentErrorType.STUDENT_NOT_FOUND));
+
+		// when
+		final ResultActions result = mockMvc.perform(get("/api/lectures/students/{studentId}/success", 1L)
+			.contentType(MediaType.APPLICATION_JSON));
+
+		// then
+		result.andExpectAll(
+				status().isBadRequest(),
+				jsonPath("$.code").value("STUDENT01"),
+				jsonPath("$.message").value("해당 학생을 찾을 수 없습니다."))
+			.andDo(print());
+	}
+
+	@DisplayName("[성공] 학생 수강 성공 조회")
+	@Test
+	void findAllApplySuccessByStudentId() throws Exception {
+		// given
+		when(lectureApplyFacade.findAllApplySuccessByStudentId(any()))
+			.thenReturn(List.of(
+				new ApplySuccessResult(1L, "강의명1", "강연자1"),
+				new ApplySuccessResult(2L, "강의명2", "강연자2"),
+				new ApplySuccessResult(3L, "강의명3", "강연자3"),
+				new ApplySuccessResult(4L, "강의명4", "강연자4")
+			));
+
+		// when
+		final ResultActions result = mockMvc.perform(get("/api/lectures/students/{studentId}/success", 1L)
+			.contentType(MediaType.APPLICATION_JSON));
+
+		// then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$").isArray(),
+				jsonPath("$", hasSize(4)),
+				jsonPath("$[0].lectureId").value(1L),
+				jsonPath("$[0].title").value("강의명1"),
+				jsonPath("$[0].lecturerName").value("강연자1"))
 			.andDo(print());
 	}
 }

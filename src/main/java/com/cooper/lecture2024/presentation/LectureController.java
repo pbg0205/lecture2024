@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 
 import com.cooper.lecture2024.business.LectureApplyFacade;
+import com.cooper.lecture2024.business.dto.response.ApplySuccessResult;
 import com.cooper.lecture2024.business.dto.response.LectureApplyResult;
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
 import com.cooper.lecture2024.presentation.dto.request.LectureApplyRequest;
+import com.cooper.lecture2024.presentation.dto.response.ApplySuccessResponse;
 import com.cooper.lecture2024.presentation.dto.response.LectureApplyResponse;
 import com.cooper.lecture2024.presentation.dto.response.LectureQueryResponse;
 
@@ -54,5 +56,17 @@ public class LectureController {
 			lectureApplyResult.lectureName());
 
 		return ResponseEntity.ok().body(lectureApplyResponse);
+	}
+
+	@GetMapping("/students/{studentId}/success")
+	public ResponseEntity<List<ApplySuccessResponse>> findAllApplySuccessByStudentId(
+		@PathVariable(name = "studentId") final Long studentId) {
+		final List<ApplySuccessResult> applySuccessResults = lectureApplyFacade.findAllApplySuccessByStudentId(studentId);
+
+		final List<ApplySuccessResponse> applySuccessResponses = applySuccessResults.stream()
+			.map(ApplySuccessResponse::from)
+			.toList();
+
+		return ResponseEntity.ok().body(applySuccessResponses);
 	}
 }
