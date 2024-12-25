@@ -18,13 +18,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.cooper.lecture2024.business.dto.ApplyCreationResult;
 import com.cooper.lecture2024.business.dto.response.LectureApplyResult;
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
 import com.cooper.lecture2024.business.dto.response.StudentQueryResult;
 import com.cooper.lecture2024.business.errors.LectureErrorCode;
 import com.cooper.lecture2024.business.errors.LectureErrorType;
 import com.cooper.lecture2024.business.errors.exception.InvalidLectureSearchConditionException;
-import com.cooper.lecture2024.domain.Lecture;
 
 @ExtendWith(MockitoExtension.class)
 class LectureApplyFacadeTest {
@@ -119,10 +119,9 @@ class LectureApplyFacadeTest {
 		// given
 		final Long userId = 1L;
 		final Long lectureId = 100L;
-		final Lecture lecture = new Lecture("강의명1", LocalDateTime.of(2024, 12, 24, 12, 0), 1L, 30, 30);
 
 		when(studentManager.findStudentQueryById(any())).thenReturn(new StudentQueryResult(1L, "학생 이름1"));
-		when(lectureManager.findLectureById(any())).thenReturn(lecture);
+		when(lectureManager.applyLecture(any(), any())).thenReturn(new ApplyCreationResult("강의명1"));
 
 		// when
 		final LectureApplyResult lectureApplyResult = lectureApplyFacade.applyLecture(userId, lectureId);
@@ -131,7 +130,6 @@ class LectureApplyFacadeTest {
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(lectureApplyResult.studentName()).isEqualTo("학생 이름1");
 			softAssertions.assertThat(lectureApplyResult.lectureName()).isEqualTo("강의명1");
-			softAssertions.assertThat(lecture.getRemainingCount()).isEqualTo(29);
 		});
 	}
 }
