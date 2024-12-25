@@ -16,12 +16,15 @@ import lombok.RequiredArgsConstructor;
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
 import com.cooper.lecture2024.business.repository.LectureRepository;
 import com.cooper.lecture2024.domain.Lecture;
+import com.cooper.lecture2024.domain.LectureApply;
+import com.cooper.lecture2024.infra.rdb.jpa.JpaLectureRepository;
 
 @Repository
 @RequiredArgsConstructor
 public class LectureRepositoryImpl implements LectureRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
+	private final JpaLectureRepository jpaLectureRepository;
 
 	@Override
 	public List<LectureQueryResult> findLecturesByStartAtBetween(
@@ -41,5 +44,10 @@ public class LectureRepositoryImpl implements LectureRepository {
 		return jpaQueryFactory.selectFrom(lecture)
 			.where(lecture.id.eq(lectureId))
 			.fetchOne();
+	}
+
+	@Override
+	public LectureApply saveLectureApply(final Long studentId, final Long lectureId) {
+		return jpaLectureRepository.save(new LectureApply(studentId, lectureId));
 	}
 }

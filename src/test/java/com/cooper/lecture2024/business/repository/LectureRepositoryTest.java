@@ -16,6 +16,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
 import com.cooper.lecture2024.domain.Lecture;
+import com.cooper.lecture2024.domain.LectureApply;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -80,4 +81,22 @@ class LectureRepositoryTest {
 			softAssertions.assertThat(lecture.getRemainingCount()).isLessThanOrEqualTo(lecture.getCapacity());
 		});
 	}
+
+	@Test
+	@DisplayName("[성공] 강의 신청 데이터 저장 성공")
+	void saveLectureApply() {
+		// given
+		final Long studentId = 1L;
+		final Long lectureId = 1L;
+
+		// when
+		final LectureApply lectureApply = lectureRepository.saveLectureApply(studentId, lectureId);
+
+		// then
+		assertSoftly(softAssertions -> {
+			softAssertions.assertThat(lectureApply.getStudentId()).isEqualTo(studentId);
+			softAssertions.assertThat(lectureApply.getLectureId()).isEqualTo(lectureId);
+		});
+	}
+
 }

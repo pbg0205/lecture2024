@@ -1,0 +1,44 @@
+package com.cooper.lecture2024.domain;
+
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class LectureApply {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@Column(nullable = false)
+	private Long studentId;
+
+	@Column(nullable = false)
+	private Long lectureId;
+
+	@CreationTimestamp
+	@Column(nullable = false, columnDefinition = "timestamp")
+	private LocalDateTime createdAt;
+
+	@UpdateTimestamp
+	@Column(nullable = false, columnDefinition = "timestamp")
+	private LocalDateTime modifiedAt;
+
+	public LectureApply(final Long studentId, final Long lectureId) {
+		this.studentId = studentId;
+		this.lectureId = lectureId;
+	}
+}
