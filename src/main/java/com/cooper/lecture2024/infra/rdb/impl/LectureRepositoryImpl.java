@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
 import com.cooper.lecture2024.business.repository.LectureRepository;
+import com.cooper.lecture2024.domain.Lecture;
 
 @Repository
 @RequiredArgsConstructor
@@ -33,5 +34,12 @@ public class LectureRepositoryImpl implements LectureRepository {
 			.innerJoin(lecturer).on(lecture.lecturerId.eq(lecturer.id))
 			.where(lecture.startAt.between(startDateTime, deadLineToStart))
 			.fetch();
+	}
+
+	@Override
+	public Lecture findById(final Long lectureId) {
+		return jpaQueryFactory.selectFrom(lecture)
+			.where(lecture.id.eq(lectureId))
+			.fetchOne();
 	}
 }
