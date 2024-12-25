@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +24,7 @@ import com.cooper.lecture2024.business.errors.LectureErrorType;
 import com.cooper.lecture2024.business.errors.exception.LectureNotFoundException;
 import com.cooper.lecture2024.business.repository.LectureRepository;
 import com.cooper.lecture2024.domain.Lecture;
+import com.cooper.lecture2024.domain.LectureApply;
 
 @ExtendWith(MockitoExtension.class)
 class LectureManagerTest {
@@ -111,5 +113,25 @@ class LectureManagerTest {
 
 		// then
 		assertThat(lecture.getTitle()).isEqualTo("lecture_title01");
+	}
+
+	@DisplayName("[성공] 강의 신청 저장")
+	@Test
+	void saveLectureApply() {
+		// given
+		final Long studentId = 1L;
+		final Long lectureId = 1L;
+
+		when(lectureRepository.saveLectureApply(any(), any())).thenReturn(
+			new LectureApply(studentId, lectureId));
+
+		// when
+		final LectureApply lectureApply = lectureManager.applyLecture(studentId, lectureId);
+
+		// then
+		SoftAssertions.assertSoftly(softAssertions -> {
+			softAssertions.assertThat(lectureApply.getStudentId()).isEqualTo(1L);
+			softAssertions.assertThat(lectureApply.getLectureId()).isEqualTo(1L);
+		});
 	}
 }

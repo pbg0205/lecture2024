@@ -14,6 +14,7 @@ import com.cooper.lecture2024.business.errors.exception.LectureNotFoundException
 import com.cooper.lecture2024.business.repository.LectureRepository;
 import com.cooper.lecture2024.common.annotations.Manager;
 import com.cooper.lecture2024.domain.Lecture;
+import com.cooper.lecture2024.domain.LectureApply;
 
 @Manager
 @RequiredArgsConstructor
@@ -32,5 +33,10 @@ public class LectureManager {
 	public Lecture findById(final Long lectureId) {
 		return Optional.ofNullable(lectureRepository.findById(lectureId))
 			.orElseThrow(() -> new LectureNotFoundException(LectureErrorType.LECTURE_NOT_FOUND));
+	}
+
+	@Transactional
+	public LectureApply applyLecture(final Long studentId, final Long lectureId) {
+		return lectureRepository.saveLectureApply(studentId, lectureId);
 	}
 }
