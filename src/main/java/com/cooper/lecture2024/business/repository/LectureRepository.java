@@ -8,10 +8,10 @@ import com.cooper.lecture2024.domain.Lecture;
 import com.cooper.lecture2024.domain.LectureApply;
 
 public interface LectureRepository {
-	List<LectureQueryResult> findLecturesByStartAtBetween(
+	List<LectureQueryResult> findAllLectureQueryByStartAtBetween(
 		final LocalDateTime startDateTime, final LocalDateTime deadLineToStart);
 
-	Lecture findById(Long lectureId);
+	Lecture findLectureById(Long lectureId);
 
 	LectureApply saveLectureApply(Long studentId, Long lectureId);
 }

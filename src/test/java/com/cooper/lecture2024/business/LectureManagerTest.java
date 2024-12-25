@@ -37,12 +37,12 @@ class LectureManagerTest {
 
 	@DisplayName("[성공] 검색 강의 시작 시간과 일치하는 강의 존재시, 목록 반환")
 	@Test
-	void findLecturesByStartAtBetween() {
+	void findLectureQueryResultsByStartAtBetween() {
 		// given
 		final LocalDateTime searchDateTime = LocalDateTime.of(2024, 12, 24, 0, 0);
 		final LocalDateTime deadLineToStart = LocalDateTime.of(2024, 12, 24, 0, 0);
 
-		when(lectureRepository.findLecturesByStartAtBetween(any(), any())).thenReturn(
+		when(lectureRepository.findAllLectureQueryByStartAtBetween(any(), any())).thenReturn(
 			List.of(
 				new LectureQueryResult(1L, "강의 이름1", 30, "강연자1", LocalDateTime.of(2024, 12, 24, 9, 0)),
 				new LectureQueryResult(2L, "강의 이름2", 15, "강연자2", LocalDateTime.of(2024, 12, 24, 12, 0)),
@@ -51,7 +51,7 @@ class LectureManagerTest {
 			));
 
 		// when
-		final List<LectureQueryResult> lectureQueryResultList = lectureManager.findLecturesByStartAtBetween(
+		final List<LectureQueryResult> lectureQueryResultList = lectureManager.findAllLectureQueryByStartAtBetween(
 			searchDateTime, deadLineToStart);
 
 		// then
@@ -71,11 +71,11 @@ class LectureManagerTest {
 		final LocalDateTime searchDateTime = LocalDateTime.of(2024, 12, 28, 0, 0);
 		final LocalDateTime deadLineToStart = LocalDateTime.of(2024, 12, 28, 23, 59);
 
-		when(lectureRepository.findLecturesByStartAtBetween(any(), any())).thenReturn(List.of());
+		when(lectureRepository.findAllLectureQueryByStartAtBetween(any(), any())).thenReturn(List.of());
 
 		// when
 		final List<LectureQueryResult> lectureQueryResultList =
-			lectureManager.findLecturesByStartAtBetween(searchDateTime, deadLineToStart);
+			lectureManager.findAllLectureQueryByStartAtBetween(searchDateTime, deadLineToStart);
 
 		// then
 		assertThat(lectureQueryResultList).hasSize(0);
@@ -87,10 +87,10 @@ class LectureManagerTest {
 		// given
 		final long lectureId = 1L;
 
-		when(lectureRepository.findById(any())).thenReturn(null);
+		when(lectureRepository.findLectureById(any())).thenReturn(null);
 
 		// when, then
-		assertThatThrownBy(() -> lectureManager.findById(lectureId))
+		assertThatThrownBy(() -> lectureManager.findLectureById(lectureId))
 			.isInstanceOf(LectureNotFoundException.class)
 			.extracting("errorType")
 			.isInstanceOf(LectureErrorType.class)
@@ -101,15 +101,15 @@ class LectureManagerTest {
 
 	@DisplayName("[성공] 강의 아이디를 통해 강의 조회")
 	@Test
-	void findById() {
+	void findLectureById() {
 		// given
 		final long lectureId = 1L;
 
-		when(lectureRepository.findById(any())).thenReturn(
+		when(lectureRepository.findLectureById(any())).thenReturn(
 			new Lecture("lecture_title01", LocalDateTime.now(), 2L, 30, 30));
 
 		// when
-		final Lecture lecture = lectureManager.findById(lectureId);
+		final Lecture lecture = lectureManager.findLectureById(lectureId);
 
 		// then
 		assertThat(lecture.getTitle()).isEqualTo("lecture_title01");

@@ -36,7 +36,7 @@ public class LectureController {
 		LocalDateTime deadLineOfStart = startDateTime.plusDays(1).minusNanos(1);
 
 		final List<LectureQueryResult> lectureQueryResults =
-			lectureApplyFacade.findLecturesByStartAtBetween(startDateTime, deadLineOfStart);
+			lectureApplyFacade.findAllLectureQueryByStartAtBetween(startDateTime, deadLineOfStart);
 
 		final List<LectureQueryResponse> lectureQueryResponses =
 			lectureQueryResults.stream().map(LectureQueryResponse::from).toList();

@@ -23,15 +23,15 @@ public class LectureManager {
 	private final LectureRepository lectureRepository;
 
 	@Transactional(readOnly = true)
-	public List<LectureQueryResult> findLecturesByStartAtBetween(
+	public List<LectureQueryResult> findAllLectureQueryByStartAtBetween(
 		final LocalDateTime startDateTime,
 		final LocalDateTime deadLineToStart) {
-		return lectureRepository.findLecturesByStartAtBetween(startDateTime, deadLineToStart);
+		return lectureRepository.findAllLectureQueryByStartAtBetween(startDateTime, deadLineToStart);
 	}
 
 	@Transactional
-	public Lecture findById(final Long lectureId) {
-		return Optional.ofNullable(lectureRepository.findById(lectureId))
+	public Lecture findLectureById(final Long lectureId) {
+		return Optional.ofNullable(lectureRepository.findLectureById(lectureId))
 			.orElseThrow(() -> new LectureNotFoundException(LectureErrorType.LECTURE_NOT_FOUND));
 	}
 
