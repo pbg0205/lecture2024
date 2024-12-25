@@ -27,7 +27,7 @@ public class LectureRepositoryImpl implements LectureRepository {
 	private final JpaLectureRepository jpaLectureRepository;
 
 	@Override
-	public List<LectureQueryResult> findLecturesByStartAtBetween(
+	public List<LectureQueryResult> findAllLectureQueryByStartAtBetween(
 		final LocalDateTime startDateTime,
 		final LocalDateTime deadLineToStart) {
 		return jpaQueryFactory.select(Projections.constructor(
@@ -40,7 +40,7 @@ public class LectureRepositoryImpl implements LectureRepository {
 	}
 
 	@Override
-	public Lecture findById(final Long lectureId) {
+	public Lecture findLectureById(final Long lectureId) {
 		return jpaQueryFactory.selectFrom(lecture)
 			.where(lecture.id.eq(lectureId))
 			.fetchOne();

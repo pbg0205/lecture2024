@@ -20,11 +20,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.cooper.lecture2024.business.dto.response.LectureApplyResult;
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
+import com.cooper.lecture2024.business.dto.response.StudentQueryResult;
 import com.cooper.lecture2024.business.errors.LectureErrorCode;
 import com.cooper.lecture2024.business.errors.LectureErrorType;
 import com.cooper.lecture2024.business.errors.exception.InvalidLectureSearchConditionException;
 import com.cooper.lecture2024.domain.Lecture;
-import com.cooper.lecture2024.domain.Student;
 
 @ExtendWith(MockitoExtension.class)
 class LectureApplyFacadeTest {
@@ -46,7 +46,7 @@ class LectureApplyFacadeTest {
 		final LocalDateTime deadLineToStart = LocalDateTime.of(2024, 12, 20, 0, 0);
 
 		// when, then
-		assertThatThrownBy(() -> lectureApplyFacade.findLecturesByStartAtBetween(startDateTime, deadLineToStart))
+		assertThatThrownBy(() -> lectureApplyFacade.findAllLectureQueryByStartAtBetween(startDateTime, deadLineToStart))
 			.isInstanceOf(InvalidLectureSearchConditionException.class)
 			.extracting("errorType")
 			.isInstanceOf(LectureErrorType.class)
@@ -57,12 +57,12 @@ class LectureApplyFacadeTest {
 
 	@Test
 	@DisplayName("[성공] 검색 날짜와 일치하는 강의 시작 존재 시, 목록 반환")
-	void findLecturesByStartAtBetween() {
+	void findAllLectureQueryByStartAtBetween() {
 		// given
 		final LocalDateTime searchDateTime = LocalDateTime.of(2024, 12, 24, 0, 0);
 		final LocalDateTime deadLineToStart = LocalDateTime.of(2024, 12, 24, 0, 0);
 
-		when(lectureManager.findLecturesByStartAtBetween(any(), any())).thenReturn(
+		when(lectureManager.findAllLectureQueryByStartAtBetween(any(), any())).thenReturn(
 			List.of(
 				new LectureQueryResult(1L, "강의 이름1", 30, "강연자1", LocalDateTime.of(2024, 12, 24, 9, 0)),
 				new LectureQueryResult(2L, "강의 이름2", 15, "강연자2", LocalDateTime.of(2024, 12, 24, 12, 0)),
@@ -72,7 +72,7 @@ class LectureApplyFacadeTest {
 
 		// when
 		final List<LectureQueryResult> lectureQueryResultList =
-			lectureApplyFacade.findLecturesByStartAtBetween(searchDateTime, deadLineToStart);
+			lectureApplyFacade.findAllLectureQueryByStartAtBetween(searchDateTime, deadLineToStart);
 
 		// then
 		assertSoftly(softAssertions -> {
@@ -91,7 +91,7 @@ class LectureApplyFacadeTest {
 		final LocalDateTime searchDateTime = LocalDateTime.of(2024, 12, 24, 0, 0);
 		final LocalDateTime deadLineToStart = LocalDateTime.of(2024, 12, 24, 0, 0);
 
-		when(lectureManager.findLecturesByStartAtBetween(any(), any())).thenReturn(
+		when(lectureManager.findAllLectureQueryByStartAtBetween(any(), any())).thenReturn(
 			List.of(
 				new LectureQueryResult(1L, "강의 이름1", 30, "강연자1", LocalDateTime.of(2024, 12, 24, 9, 0)),
 				new LectureQueryResult(2L, "강의 이름2", 15, "강연자2", LocalDateTime.of(2024, 12, 24, 12, 0)),
@@ -101,7 +101,7 @@ class LectureApplyFacadeTest {
 
 		// when
 		final List<LectureQueryResult> lectureQueryResultList =
-			lectureApplyFacade.findLecturesByStartAtBetween(searchDateTime, deadLineToStart);
+			lectureApplyFacade.findAllLectureQueryByStartAtBetween(searchDateTime, deadLineToStart);
 
 		// then
 		assertSoftly(softAssertions -> {
@@ -121,8 +121,8 @@ class LectureApplyFacadeTest {
 		final Long lectureId = 100L;
 		final Lecture lecture = new Lecture("강의명1", LocalDateTime.of(2024, 12, 24, 12, 0), 1L, 30, 30);
 
-		when(studentManager.findById(any())).thenReturn(new Student("학생 이름1"));
-		when(lectureManager.findById(any())).thenReturn(lecture);
+		when(studentManager.findStudentQueryById(any())).thenReturn(new StudentQueryResult(1L, "학생 이름1"));
+		when(lectureManager.findLectureById(any())).thenReturn(lecture);
 
 		// when
 		final LectureApplyResult lectureApplyResult = lectureApplyFacade.applyLecture(userId, lectureId);

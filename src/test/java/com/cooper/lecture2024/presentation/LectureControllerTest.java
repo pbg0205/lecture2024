@@ -68,7 +68,7 @@ class LectureControllerTest {
 		// given
 		String startDate = "2024-12-24";
 
-		when(lectureApplyFacade.findLecturesByStartAtBetween(any(), any()))
+		when(lectureApplyFacade.findAllLectureQueryByStartAtBetween(any(), any()))
 			.thenReturn(
 				List.of(
 					new LectureQueryResult(1L, "title01", 20, "강연자01", LocalDateTime.of(2024, 12, 24, 9, 0)),

@@ -12,11 +12,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.cooper.lecture2024.business.dto.response.StudentQueryResult;
 import com.cooper.lecture2024.business.errors.StudentErrorCode;
 import com.cooper.lecture2024.business.errors.StudentErrorType;
 import com.cooper.lecture2024.business.errors.exception.StudentNotFoundException;
 import com.cooper.lecture2024.business.repository.StudentRepository;
-import com.cooper.lecture2024.domain.Student;
 
 @ExtendWith(MockitoExtension.class)
 class StudentManagerTest {
@@ -31,13 +31,11 @@ class StudentManagerTest {
 	@Test
 	void notFoundStudent() {
 		// given
-		final String name = "학생 이름1";
-
-		when(studentRepository.findById(anyLong()))
+		when(studentRepository.findStudentQueryById(anyLong()))
 			.thenThrow(new StudentNotFoundException(StudentErrorType.STUDENT_NOT_FOUND));
 
 		// when, then
-		assertThatThrownBy(() -> studentManager.findById(1L)).isInstanceOf(StudentNotFoundException.class)
+		assertThatThrownBy(() -> studentManager.findStudentQueryById(1L)).isInstanceOf(StudentNotFoundException.class)
 			.extracting("errorType")
 			.isInstanceOf(StudentErrorType.class)
 			.satisfies(
@@ -47,16 +45,17 @@ class StudentManagerTest {
 
 	@DisplayName("학생 조회 성공")
 	@Test
-	void findById() {
+	void findStudentQueryById() {
 		// given
+		final Long id = 1L;
 		final String name = "학생 이름1";
 
-		when(studentRepository.findById(anyLong())).thenReturn(new Student(name));
+		when(studentRepository.findStudentQueryById(anyLong())).thenReturn(new StudentQueryResult(id, name));
 
 		// when
-		final Student student = studentManager.findById(1L);
+		final StudentQueryResult studentQueryResult = studentManager.findStudentQueryById(1L);
 
 		// then
-		assertThat(student).extracting("name").isEqualTo(name);
+		assertThat(studentQueryResult).extracting("name").isEqualTo(name);
 	}
 }

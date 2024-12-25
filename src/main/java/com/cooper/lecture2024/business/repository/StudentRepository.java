@@ -1,7 +1,7 @@
 package com.cooper.lecture2024.business.repository;
 
-import com.cooper.lecture2024.domain.Student;
+import com.cooper.lecture2024.business.dto.response.StudentQueryResult;
 
 public interface StudentRepository {
-	Student findById(Long studentId);
+	StudentQueryResult findStudentQueryById(Long studentId);
 }

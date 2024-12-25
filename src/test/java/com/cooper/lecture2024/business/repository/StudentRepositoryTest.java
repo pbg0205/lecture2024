@@ -10,7 +10,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.jdbc.Sql;
 
-import com.cooper.lecture2024.domain.Student;
+import com.cooper.lecture2024.business.dto.response.StudentQueryResult;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -28,10 +28,10 @@ class StudentRepositoryTest {
 		final Long studentId = 10000L;
 
 		// when
-		final Student student = studentRepository.findById(studentId);
+		final StudentQueryResult studentQueryResult = studentRepository.findStudentQueryById(studentId);
 
 		// then
-		assertThat(student).isNull();
+		assertThat(studentQueryResult).isNull();
 	}
 
 	@DisplayName("[성공] 학생 조회 성공")
@@ -41,9 +41,9 @@ class StudentRepositoryTest {
 		final Long studentId = 1L;
 
 		// when
-		final Student student = studentRepository.findById(studentId);
+		final StudentQueryResult studentQueryResult = studentRepository.findStudentQueryById(studentId);
 
 		// then
-		assertThat(student.getId()).isEqualTo(1L);
+		assertThat(studentQueryResult.id()).isEqualTo(1L);
 	}
 }

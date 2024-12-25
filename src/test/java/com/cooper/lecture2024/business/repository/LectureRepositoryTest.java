@@ -36,7 +36,7 @@ class LectureRepositoryTest {
 
 		// when
 		final List<LectureQueryResult> lectureQueryResultList =
-			lectureRepository.findLecturesByStartAtBetween(startDateTime, deadLineToStart);
+			lectureRepository.findAllLectureQueryByStartAtBetween(startDateTime, deadLineToStart);
 
 		// then
 		assertSoftly(softAssertions -> {
@@ -58,7 +58,7 @@ class LectureRepositoryTest {
 
 		// when
 		final List<LectureQueryResult> lectureQueryResultList =
-			lectureRepository.findLecturesByStartAtBetween(startDateTime, deadLineToStart);
+			lectureRepository.findAllLectureQueryByStartAtBetween(startDateTime, deadLineToStart);
 
 		// then
 		assertThat(lectureQueryResultList.size()).isEqualTo(0);
@@ -72,7 +72,7 @@ class LectureRepositoryTest {
 		final long lectureId = 1L;
 
 		// when
-		final Lecture lecture = lectureRepository.findById(lectureId);
+		final Lecture lecture = lectureRepository.findLectureById(lectureId);
 
 		// then
 		assertSoftly(softAssertions -> {
