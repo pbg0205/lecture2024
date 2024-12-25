@@ -74,4 +74,9 @@ public class Lecture {
 			throw new LectureConstraintsViolationException(LectureErrorType.REMAINING_COUNT_NEGATIVE);
 		}
 	}
+
+	public Integer decreaseRemainingCount() {
+		this.remainingCount = this.remainingCount - 1;
+		return remainingCount;
+	}
 }
