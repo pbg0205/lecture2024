@@ -1,6 +1,7 @@
 package com.cooper.lecture2024.infra.rdb.impl;
 
 import static com.cooper.lecture2024.domain.QLecture.lecture;
+import static com.cooper.lecture2024.domain.QLectureApply.lectureApply;
 import static com.cooper.lecture2024.domain.QLecturer.lecturer;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
 
+import com.cooper.lecture2024.business.dto.response.ApplySuccessResult;
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
 import com.cooper.lecture2024.business.repository.LectureRepository;
 import com.cooper.lecture2024.domain.Lecture;
@@ -31,8 +33,8 @@ public class LectureRepositoryImpl implements LectureRepository {
 		final LocalDateTime startDateTime,
 		final LocalDateTime deadLineToStart) {
 		return jpaQueryFactory.select(Projections.constructor(
-			LectureQueryResult.class,
-			lecture.id, lecture.title, lecture.remainingCount, lecturer.name, lecture.startAt))
+				LectureQueryResult.class,
+				lecture.id, lecture.title, lecture.remainingCount, lecturer.name, lecture.startAt))
 			.from(lecture)
 			.innerJoin(lecturer).on(lecture.lecturerId.eq(lecturer.id))
 			.where(lecture.startAt.between(startDateTime, deadLineToStart))
@@ -49,5 +51,19 @@ public class LectureRepositoryImpl implements LectureRepository {
 	@Override
 	public LectureApply saveLectureApply(final Long studentId, final Long lectureId) {
 		return jpaLectureRepository.save(new LectureApply(studentId, lectureId));
+	}
+
+	@Override
+	public List<ApplySuccessResult> findAllApplySuccessByStudentId(final Long studentId) {
+		return jpaQueryFactory.select(Projections.constructor(
+				ApplySuccessResult.class,
+				lecture.id,
+				lecture.title,
+				lecturer.name))
+			.from(lecture)
+			.innerJoin(lectureApply).on(lecture.id.eq(lectureApply.lectureId))
+			.innerJoin(lecturer).on(lecturer.id.eq(lecture.lecturerId))
+			.where(lectureApply.studentId.eq(studentId))
+			.fetch();
 	}
 }
