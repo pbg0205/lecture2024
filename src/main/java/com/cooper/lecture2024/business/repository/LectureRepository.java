@@ -17,4 +17,6 @@ public interface LectureRepository {
 	LectureApply saveLectureApply(Long studentId, Long lectureId);
 
 	List<ApplySuccessResult> findAllApplySuccessByStudentId(Long studentId);
+
+	boolean existLectureApplyByStudentIdAndLectureId(Long studentId, Long lectureId);
 }
