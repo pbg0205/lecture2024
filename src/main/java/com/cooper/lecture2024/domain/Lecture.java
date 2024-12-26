@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 
 import com.cooper.lecture2024.business.errors.LectureErrorType;
 import com.cooper.lecture2024.business.errors.exception.LectureConstraintsViolationException;
+import com.cooper.lecture2024.business.errors.exception.LectureRegistrationClosedException;
 
 @Getter
 @Entity
@@ -75,7 +76,11 @@ public class Lecture {
 		}
 	}
 
-	public Integer decreaseRemainingCount() {
+	public int decreaseRemainingCount() {
+		if (this.remainingCount <= 0) {
+			throw new LectureRegistrationClosedException(LectureErrorType.LECTURE_REGISTRATION_CLOSED);
+		}
+
 		this.remainingCount = this.remainingCount - 1;
 		return remainingCount;
 	}

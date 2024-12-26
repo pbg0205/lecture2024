@@ -30,9 +30,9 @@ public class LectureManager {
 		return lectureRepository.findAllLectureQueryByStartAtBetween(startDateTime, deadLineToStart);
 	}
 
-	@Transactional
+	@Transactional(timeout = 5)
 	public ApplyCreationResult applyLecture(final Long studentId, final Long lectureId) {
-		final Lecture lecture = findLectureById(lectureId);
+		final Lecture lecture = findLectureByIdForUpdate(lectureId);
 		lecture.decreaseRemainingCount();
 
 		lectureRepository.saveLectureApply(studentId, lectureId);
@@ -40,8 +40,8 @@ public class LectureManager {
 		return new ApplyCreationResult(lecture.getTitle());
 	}
 
-	private Lecture findLectureById(final Long lectureId) {
-		return Optional.ofNullable(lectureRepository.findLectureById(lectureId))
+	private Lecture findLectureByIdForUpdate(final Long lectureId) {
+		return Optional.ofNullable(lectureRepository.findLectureByIdForUpdate(lectureId))
 			.orElseThrow(() -> new LectureNotFoundException(LectureErrorType.LECTURE_NOT_FOUND));
 	}
 
