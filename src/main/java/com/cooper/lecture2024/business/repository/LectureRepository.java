@@ -12,7 +12,7 @@ public interface LectureRepository {
 	List<LectureQueryResult> findAllLectureQueryByStartAtBetween(
 		final LocalDateTime startDateTime, final LocalDateTime deadLineToStart);
 
-	Lecture findLectureById(Long lectureId);
+	Lecture findLectureByIdForUpdate(Long lectureId);
 
 	LectureApply saveLectureApply(Long studentId, Long lectureId);
 

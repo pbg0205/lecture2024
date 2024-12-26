@@ -89,7 +89,7 @@ class LectureManagerTest {
 		final long studentId = 1L;
 		final long lectureId = 1L;
 
-		when(lectureRepository.findLectureById(any())).thenReturn(null);
+		when(lectureRepository.findLectureByIdForUpdate(any())).thenReturn(null);
 
 		// when, then
 		assertThatThrownBy(() -> lectureManager.applyLecture(studentId, lectureId))
@@ -103,12 +103,12 @@ class LectureManagerTest {
 
 	@DisplayName("[성공] 강의 아이디를 통해 강의 조회")
 	@Test
-	void findLectureById() {
+	void findLectureByIdForUpdate() {
 		// given
 		final long studentId = 1L;
 		final long lectureId = 1L;
 
-		when(lectureRepository.findLectureById(any())).thenReturn(
+		when(lectureRepository.findLectureByIdForUpdate(any())).thenReturn(
 			new Lecture("lecture_title01", LocalDateTime.now(), 2L, 30, 30));
 
 		// when
@@ -127,7 +127,7 @@ class LectureManagerTest {
 
 		when(lectureRepository.saveLectureApply(any(), any())).thenReturn(
 			new LectureApply(studentId, lectureId));
-		when(lectureRepository.findLectureById(any()))
+		when(lectureRepository.findLectureByIdForUpdate(any()))
 			.thenReturn(new Lecture("lecture_title", LocalDateTime.of(2024, 12, 24, 12, 0), 1L, 30, 30));
 
 		// when

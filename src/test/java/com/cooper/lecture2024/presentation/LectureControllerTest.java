@@ -30,6 +30,7 @@ import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
 import com.cooper.lecture2024.business.errors.LectureErrorType;
 import com.cooper.lecture2024.business.errors.StudentErrorType;
 import com.cooper.lecture2024.business.errors.exception.LectureNotFoundException;
+import com.cooper.lecture2024.business.errors.exception.LectureRegistrationClosedException;
 import com.cooper.lecture2024.business.errors.exception.StudentNotFoundException;
 import com.cooper.lecture2024.presentation.dto.request.LectureApplyRequest;
 
@@ -138,6 +139,29 @@ class LectureControllerTest {
 				status().isBadRequest(),
 				jsonPath("$.code").value("LECTURE02"),
 				jsonPath("$.message").value("강의를 찾을 수 없습니다."))
+			.andDo(print());
+	}
+
+	@DisplayName("[실패] 수강 신청 마감")
+	@Test
+	void closeLectureRegistration() throws Exception {
+		// given
+		final LectureApplyRequest lectureApplyRequest = new LectureApplyRequest(1L, 1L);
+		final String content = objectMapper.writeValueAsString(lectureApplyRequest);
+
+		when(lectureApplyFacade.applyLecture(any(), any()))
+			.thenThrow(new LectureRegistrationClosedException(LectureErrorType.LECTURE_REGISTRATION_CLOSED));
+
+		// when
+		final ResultActions result = mockMvc.perform(post("/api/lectures/apply")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(content));
+
+		// then
+		result.andExpectAll(
+				status().isBadRequest(),
+				jsonPath("$.code").value("LECTURE05"),
+				jsonPath("$.message").value("해당 강의의 수강 신청이 마감되었습니다."))
 			.andDo(print());
 	}
 
