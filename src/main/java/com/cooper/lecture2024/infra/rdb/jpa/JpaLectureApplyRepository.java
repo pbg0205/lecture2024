@@ -4,5 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.cooper.lecture2024.domain.LectureApply;
 
-public interface JpaLectureRepository extends JpaRepository<LectureApply, Long> {
+public interface JpaLectureApplyRepository extends JpaRepository<LectureApply, Long> {
 }

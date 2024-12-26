@@ -8,10 +8,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import jakarta.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
 
 import com.cooper.lecture2024.business.dto.response.ApplySuccessResult;
@@ -19,14 +21,15 @@ import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
 import com.cooper.lecture2024.business.repository.LectureRepository;
 import com.cooper.lecture2024.domain.Lecture;
 import com.cooper.lecture2024.domain.LectureApply;
-import com.cooper.lecture2024.infra.rdb.jpa.JpaLectureRepository;
+import com.cooper.lecture2024.infra.rdb.jpa.JpaLectureApplyRepository;
 
 @Repository
 @RequiredArgsConstructor
+@Transactional
 public class LectureRepositoryImpl implements LectureRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
-	private final JpaLectureRepository jpaLectureRepository;
+	private final JpaLectureApplyRepository jpaLectureApplyRepository;
 
 	@Override
 	public List<LectureQueryResult> findAllLectureQueryByStartAtBetween(
@@ -42,15 +45,16 @@ public class LectureRepositoryImpl implements LectureRepository {
 	}
 
 	@Override
-	public Lecture findLectureById(final Long lectureId) {
+	public Lecture findLectureByIdForUpdate(final Long lectureId) {
 		return jpaQueryFactory.selectFrom(lecture)
 			.where(lecture.id.eq(lectureId))
+			.setLockMode(LockModeType.PESSIMISTIC_WRITE)
 			.fetchOne();
 	}
 
 	@Override
 	public LectureApply saveLectureApply(final Long studentId, final Long lectureId) {
-		return jpaLectureRepository.save(new LectureApply(studentId, lectureId));
+		return jpaLectureApplyRepository.save(new LectureApply(studentId, lectureId));
 	}
 
 	@Override
