@@ -73,7 +73,7 @@ class LectureRepositoryTest {
 		final long lectureId = 1L;
 
 		// when
-		final Lecture lecture = lectureRepository.findLectureById(lectureId);
+		final Lecture lecture = lectureRepository.findLectureByIdForUpdate(lectureId);
 
 		// then
 		assertSoftly(softAssertions -> {
