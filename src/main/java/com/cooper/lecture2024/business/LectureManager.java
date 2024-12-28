@@ -36,9 +36,6 @@ public class LectureManager {
 		final Lecture lecture = findLectureByIdForUpdate(lectureId);
 		lecture.decreaseRemainingCount();
 
-		if (lectureRepository.existLectureApplyByStudentIdAndLectureId(studentId, lectureId)) {
-			throw new LectureDuplicatedRegistrationException(LectureErrorType.LECTURE_DUPLICATED_REGISTRATION);
-		}
 		lectureRepository.saveLectureApply(studentId, lectureId);
 
 		return new ApplyCreationResult(lecture.getTitle());

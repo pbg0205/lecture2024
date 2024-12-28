@@ -147,7 +147,8 @@ class LectureManagerTest {
 
 		when(lectureRepository.findLectureByIdForUpdate(any())).thenReturn(
 			new Lecture("lecture_title01", LocalDateTime.now(), 2L, 30, 30));
-		when(lectureRepository.existLectureApplyByStudentIdAndLectureId(any(), any())).thenReturn(true);
+		when(lectureRepository.saveLectureApply(any(), any()))
+			.thenThrow(new LectureDuplicatedRegistrationException(LectureErrorType.LECTURE_DUPLICATED_REGISTRATION));
 
 		// when, then
 		assertThatThrownBy(() -> lectureManager.applyLecture(studentId, lectureId))

@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,6 +22,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import com.cooper.lecture2024.business.dto.response.ApplySuccessResult;
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
+import com.cooper.lecture2024.business.errors.exception.LectureDuplicatedRegistrationException;
 import com.cooper.lecture2024.domain.Lecture;
 import com.cooper.lecture2024.domain.LectureApply;
 
@@ -103,6 +105,19 @@ class LectureRepositoryTest {
 			softAssertions.assertThat(lectureApply.getStudentId()).isEqualTo(studentId);
 			softAssertions.assertThat(lectureApply.getLectureId()).isEqualTo(lectureId);
 		});
+	}
+
+	@Test
+	@DisplayName("[실패] 강의 신청 데이터 저장 성공")
+	@Sql("classpath:sql/lecture_apply_sample.sql")
+	void saveLectureApplyFail() {
+		// given
+		final Long studentId = 1L;
+		final Long lectureId = 2L;
+
+		// when, then
+		Assertions.assertThatThrownBy(() -> lectureRepository.saveLectureApply(studentId, lectureId))
+			.isInstanceOf(LectureDuplicatedRegistrationException.class);
 	}
 
 	@Test

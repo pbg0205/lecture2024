@@ -7,6 +7,7 @@ import static com.cooper.lecture2024.domain.QLecturer.lecturer;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 
 import com.cooper.lecture2024.business.dto.response.ApplySuccessResult;
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
+import com.cooper.lecture2024.business.errors.LectureErrorType;
+import com.cooper.lecture2024.business.errors.exception.LectureDuplicatedRegistrationException;
 import com.cooper.lecture2024.business.repository.LectureRepository;
 import com.cooper.lecture2024.domain.Lecture;
 import com.cooper.lecture2024.domain.LectureApply;
@@ -54,7 +57,11 @@ public class LectureRepositoryImpl implements LectureRepository {
 
 	@Override
 	public LectureApply saveLectureApply(final Long studentId, final Long lectureId) {
-		return jpaLectureApplyRepository.save(new LectureApply(studentId, lectureId));
+		try {
+			return jpaLectureApplyRepository.save(new LectureApply(studentId, lectureId));
+		} catch (final DataIntegrityViolationException exception) {
+			throw new LectureDuplicatedRegistrationException(LectureErrorType.LECTURE_DUPLICATED_REGISTRATION);
+		}
 	}
 
 	@Override
