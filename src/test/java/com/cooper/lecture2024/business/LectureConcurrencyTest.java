@@ -18,6 +18,9 @@ import org.springframework.test.context.jdbc.Sql;
 
 import com.cooper.lecture2024.business.repository.LectureRepository;
 import com.cooper.lecture2024.test_components.listener.DataCleanUpExecutionListener;
+import org.springframework.test.context.jdbc.Sql;
+
+import com.cooper.lecture2024.business.repository.LectureRepository;
 import com.cooper.lecture2024.test_components.repository.LectureApplyTestRepository;
 import com.cooper.lecture2024.domain.Lecture;
 import com.cooper.lecture2024.domain.LectureApply;
