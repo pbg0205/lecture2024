@@ -70,4 +70,13 @@ public class LectureRepositoryImpl implements LectureRepository {
 			.where(lectureApply.studentId.eq(studentId))
 			.fetch();
 	}
+
+	@Override
+	public boolean existLectureApplyByStudentIdAndLectureId(final Long studentId, final Long lectureId) {
+		return jpaQueryFactory.select(lectureApply.studentId, lectureApply.lectureId)
+			.from(lectureApply)
+			.where(lectureApply.studentId.eq(studentId).and(lectureApply.lectureId.eq(lectureId)))
+			.setLockMode(LockModeType.PESSIMISTIC_WRITE)
+			.fetchFirst() != null;
+	}
 }

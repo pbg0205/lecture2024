@@ -2,12 +2,17 @@ package com.cooper.lecture2024.business.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.junit.jupiter.params.provider.Arguments.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -114,5 +119,24 @@ class LectureRepositoryTest {
 
 		// then
 		assertThat(applySuccessResults).hasSize(5);
+	}
+
+
+	@DisplayName("[성공] 학생의 강의 성공 목록 조회")
+	@MethodSource("studentAndLectureIdSource")
+	@ParameterizedTest
+	@Sql({"classpath:sql/lecture_sample.sql", "classpath:sql/lecturer_sample.sql",
+		"classpath:sql/students_sample.sql", "classpath:sql/lecture_apply_sample.sql"})
+	void existLectureApplyByStudentIdAndLectureId(final Long studentId, final Long lectureId, final boolean expectedResult) {
+		// when, then
+		assertThat(lectureRepository.existLectureApplyByStudentIdAndLectureId(studentId, lectureId))
+			.isEqualTo(expectedResult);
+	}
+
+	private static Stream<Arguments> studentAndLectureIdSource() {
+		return Stream.of(
+			arguments(1L, 1L, false),
+			arguments(1L, 2L, true)
+		);
 	}
 }

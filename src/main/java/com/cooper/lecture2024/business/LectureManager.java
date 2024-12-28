@@ -12,6 +12,7 @@ import com.cooper.lecture2024.business.dto.ApplyCreationResult;
 import com.cooper.lecture2024.business.dto.response.ApplySuccessResult;
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
 import com.cooper.lecture2024.business.errors.LectureErrorType;
+import com.cooper.lecture2024.business.errors.exception.LectureDuplicatedRegistrationException;
 import com.cooper.lecture2024.business.errors.exception.LectureNotFoundException;
 import com.cooper.lecture2024.business.repository.LectureRepository;
 import com.cooper.lecture2024.common.annotations.Manager;
@@ -35,6 +36,9 @@ public class LectureManager {
 		final Lecture lecture = findLectureByIdForUpdate(lectureId);
 		lecture.decreaseRemainingCount();
 
+		if (lectureRepository.existLectureApplyByStudentIdAndLectureId(studentId, lectureId)) {
+			throw new LectureDuplicatedRegistrationException(LectureErrorType.LECTURE_DUPLICATED_REGISTRATION);
+		}
 		lectureRepository.saveLectureApply(studentId, lectureId);
 
 		return new ApplyCreationResult(lecture.getTitle());

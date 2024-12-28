@@ -22,6 +22,7 @@ import com.cooper.lecture2024.business.dto.response.ApplySuccessResult;
 import com.cooper.lecture2024.business.dto.response.LectureQueryResult;
 import com.cooper.lecture2024.business.errors.LectureErrorCode;
 import com.cooper.lecture2024.business.errors.LectureErrorType;
+import com.cooper.lecture2024.business.errors.exception.LectureDuplicatedRegistrationException;
 import com.cooper.lecture2024.business.errors.exception.LectureNotFoundException;
 import com.cooper.lecture2024.business.repository.LectureRepository;
 import com.cooper.lecture2024.domain.Lecture;
@@ -135,6 +136,27 @@ class LectureManagerTest {
 
 		// then
 		assertThat(applyCreationResult.lectureTitle()).isEqualTo("lecture_title");
+	}
+
+	@DisplayName("[실패] 중복 수강 신청 실패")
+	@Test
+	void isDisableToRegisterDuplicatedLectureApply() {
+		// given
+		final Long studentId = 1L;
+		final Long lectureId = 1L;
+
+		when(lectureRepository.findLectureByIdForUpdate(any())).thenReturn(
+			new Lecture("lecture_title01", LocalDateTime.now(), 2L, 30, 30));
+		when(lectureRepository.existLectureApplyByStudentIdAndLectureId(any(), any())).thenReturn(true);
+
+		// when, then
+		assertThatThrownBy(() -> lectureManager.applyLecture(studentId, lectureId))
+			.isInstanceOf(LectureDuplicatedRegistrationException.class)
+			.extracting("errorType")
+			.isInstanceOf(LectureErrorType.class)
+			.satisfies(
+				errorType -> assertThat(((LectureErrorType)errorType).getErrorCode()).isEqualTo(
+					LectureErrorCode.LECTURE06));
 	}
 
 	@DisplayName("[성공] 강의 신청 성공 목록 조회 ")
