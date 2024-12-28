@@ -17,13 +17,10 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.jdbc.Sql;
 
 import com.cooper.lecture2024.business.repository.LectureRepository;
-import com.cooper.lecture2024.test_components.listener.DataCleanUpExecutionListener;
-import org.springframework.test.context.jdbc.Sql;
-
-import com.cooper.lecture2024.business.repository.LectureRepository;
-import com.cooper.lecture2024.test_components.repository.LectureApplyTestRepository;
 import com.cooper.lecture2024.domain.Lecture;
 import com.cooper.lecture2024.domain.LectureApply;
+import com.cooper.lecture2024.test_components.listener.DataCleanUpExecutionListener;
+import com.cooper.lecture2024.test_components.repository.LectureApplyTestRepository;
 
 @SpringBootTest
 @Sql({"classpath:sql/lecture_sample.sql", "classpath:sql/lecturer_sample.sql", "classpath:sql/students_sample.sql"})
